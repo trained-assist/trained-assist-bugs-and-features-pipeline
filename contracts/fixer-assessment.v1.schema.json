@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fixer-assessment/v1 — assessment.json written by the fixer's assess agent",
+  "type": "object",
+  "required": ["scope", "size", "ambiguity", "fixable", "reason"],
+  "properties": {
+    "scope": { "enum": ["in", "out"] },
+    "scenario": { "type": ["string", "null"] },
+    "size": { "enum": ["XS", "S", "M", "L", "XL"] },
+    "ambiguity": { "enum": ["low", "medium", "high"] },
+    "fixable": { "type": "boolean" },
+    "summary": { "type": "string" },
+    "plan": { "type": "array", "items": { "type": "string" } },
+    "reason": { "type": "string" }
+  }
+}

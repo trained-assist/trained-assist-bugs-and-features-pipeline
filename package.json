@@ -1,0 +1,14 @@
+{
+  "name": "trained-assist-bugs-and-features-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bugs & Features pipeline for trained-assist: user report folders -> triaged GitHub issues -> fixer draft PRs",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node --check src/triage.js && node --check src/fixer.js",
+    "triage": "node src/triage.js",
+    "fix": "node src/fixer.js"
+  }
+}

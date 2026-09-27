@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/trained-assist/trained-assist-bugs-and-features-pipeline/contracts/bug-feature-report.v1.schema.json",
+  "title": "bug-feature-report/v1 — report.json written by the bug_or_feature_report MCP tool",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "kind",
+    "title",
+    "summary",
+    "status",
+    "createdAt",
+    "reporter"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bug-feature-report/v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9а-яё-]+$"
+    },
+    "kind": {
+      "enum": [
+        "bug",
+        "feature"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "userWords": {
+      "type": "string"
+    },
+    "expected": {
+      "type": "string"
+    },
+    "actual": {
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "area": {
+      "type": "string"
+    },
+    "status": {
+      "const": "open"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reporter": {
+      "type": "object",
+      "required": [
+        "profile"
+      ],
+      "properties": {
+        "profile": {
+          "type": "string"
+        },
+        "channel": {
+          "enum": [
+            "telegram",
+            "web",
+            "agent"
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "chatId": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stepsToReproduce": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+# Stage 3 — fixer (reusable). Called from the TARGET repo on `issues` events:
+#
+#   uses: trained-assist/trained-assist-bugs-and-features-pipeline/.github/workflows/fix-issue.yml@main
+#
+# assess (agent, read-only) → labels + verdict comment → if auto: execute → verify → draft PR.
+# The target repo is checked out at $GITHUB_WORKSPACE root (so `../<sibling>` clones in
+# setup_cmd work as in its own CI); this repo goes to .bf-pipeline/ (git-excluded).
+name: Fix issue (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      issue_number: { type: number, required: true }
+      force: { type: boolean, default: false, description: 'Ignore skip labels (fixer:retry / manual run)' }
+      execute: { type: boolean, default: true, description: 'false = assess + label only, never open a PR' }
+      draft_pr: { type: boolean, default: true, description: 'Open PRs as draft (target CI auto-merges non-drafts)' }
+      base_branch: { type: string, default: main }
+      setup_cmd: { type: string, default: 'npm ci' }
+      verify_cmd: { type: string, default: 'npm test' }
+      node_version: { type: string, default: '22' }
+      pipeline_ref: { type: string, default: main }
+    secrets:
+      llm_ladder_token: { required: true }
+      gh_token: { required: true, description: 'PAT (contents+PRs+issues write). GITHUB_TOKEN-created PRs do not trigger CI.' }
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    concurrency:
+      group: bf-fixer-${{ github.repository }}-${{ inputs.issue_number }}
+      cancel-in-progress: false
+    steps:
+      - name: Check out target repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base_branch }}
+          token: ${{ secrets.gh_token }}
+      - name: Check out pipeline
+        uses: actions/checkout@v4
+        with:
+          repository: trained-assist/trained-assist-bugs-and-features-pipeline
+          ref: ${{ inputs.pipeline_ref }}
+          path: .bf-pipeline
+      - run: echo ".bf-pipeline/" >> .git/info/exclude
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+      - name: Install opencode
+        run: npm install -g opencode-ai@1.18.31
+      - name: Target setup
+        if: inputs.execute
+        run: ${{ inputs.setup_cmd }}
+      - name: Assess and fix
+        env:
+          GH_TOKEN: ${{ secrets.gh_token }}
+          LLM_LADDER_TOKEN: ${{ secrets.llm_ladder_token }}
+          TARGET_REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          TARGET_DIR: ${{ github.workspace }}
+          BASE_BRANCH: ${{ inputs.base_branch }}
+          VERIFY_CMD: ${{ inputs.verify_cmd }}
+          DRAFT_PR: ${{ inputs.draft_pr }}
+          FORCE: ${{ inputs.force }}
+          EXECUTE: ${{ inputs.execute }}
+          PIPELINE_OPENCODE_CONFIG: ${{ github.workspace }}/.bf-pipeline/opencode/ladder.json
+        run: node .bf-pipeline/src/fixer.js

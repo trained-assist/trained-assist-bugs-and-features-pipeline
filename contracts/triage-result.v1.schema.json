@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "bug-feature-triage/v1 — triage.json written by the pipeline into the report folder",
+  "type": "object",
+  "required": ["schema", "status", "attempts", "at"],
+  "properties": {
+    "schema": { "const": "bug-feature-triage/v1" },
+    "status": { "enum": ["filed", "duplicate", "skipped", "retrying", "filed-fallback"] },
+    "issue": { "type": ["object", "null"], "properties": { "number": { "type": "integer" }, "url": { "type": "string" } } },
+    "duplicateOf": { "type": ["integer", "null"] },
+    "scenario": { "type": ["object", "null"] },
+    "kind": { "enum": ["bug", "feature"] },
+    "attempts": { "type": "integer" },
+    "at": { "type": "string" },
+    "reason": { "type": "string" }
+  }
+}

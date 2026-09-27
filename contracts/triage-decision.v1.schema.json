@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "triage-decision/v1 — decision.json written by the triage agent (workspace only)",
+  "type": "object",
+  "required": ["action", "kind", "title", "scenario", "reason"],
+  "properties": {
+    "action": { "enum": ["new", "duplicate", "skip"] },
+    "duplicate_of": { "type": ["integer", "null"] },
+    "kind": { "enum": ["bug", "feature"] },
+    "title": { "type": "string", "minLength": 3, "maxLength": 140 },
+    "body": { "type": "string" },
+    "scenario": {
+      "type": "object",
+      "required": ["match"],
+      "properties": {
+        "path": { "type": ["string", "null"] },
+        "match": { "enum": ["existing", "extends", "new", "none"] },
+        "note": { "type": "string" }
+      }
+    },
+    "area": { "type": "string" },
+    "severity": { "enum": ["low", "medium", "high", "critical"] },
+    "reason": { "type": "string" }
+  }
+}
